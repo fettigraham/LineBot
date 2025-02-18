@@ -1,4 +1,5 @@
 const pushMessage = require("./pushMessage");
+const { saveUserState, updateUserState, getUserState } = require("./database");
 
 // Dialogue tree structure
 const dialogueTree = {
@@ -37,28 +38,30 @@ const dialogueTree = {
     }
 };
 
-module.exports = async function handleMessage(event, userSessions){
+module.exports = async function handleMessage(event){
     const userId = event.source.userId;
-    if (!userSessions[userId]) {
-        userSessions[userId] = { state: "start" };
-        const currentState = userSessions[userId].state;
+    let userState = await getUserState(userId);
+    if (!userState) {
+        userState = "start";
+        const currentState = userState;
         const currentDialogue = dialogueTree[currentState];
         await pushMessage(userId, currentDialogue.message);
         console.log('State: ' + currentState);
+        await saveUserState(userId, currentState);
     }
     else{
-        const currentState = userSessions[userId].state;
+        const currentState = userState;
         const currentDialogue = dialogueTree[currentState];
         const userInput = event.message.text;
         const nextState = currentDialogue.options ? currentDialogue.options[userInput] : null;
         if (nextState) {
-            userSessions[userId].state = nextState;
+            await updateUserState(userId, nextState);
             const nextDialogue = dialogueTree[nextState];
             await pushMessage(userId, nextDialogue.message);
-            console.log('State: '+ userSessions[userId].state);
-            if (userSessions[userId].state == "smallTea" || userSessions[userId].state == "largeTea" ||
-                userSessions[userId].state == "smallCoffee" || userSessions[userId].state == "largeCoffee"){
-                delete userSessions[userId];
+            console.log('State: '+ nextState);
+            if (nextState == "smallTea" || nextState == "largeTea" ||
+                nextState == "smallCoffee" || nextState == "largeCoffee"){
+                await updateUserState(userId, null);
             }
 
         }

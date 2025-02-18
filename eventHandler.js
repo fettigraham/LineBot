@@ -1,10 +1,10 @@
 const handleMessage = require("./messageHandler");
-module.exports = async function handleEvent(event, userSessions) {
+module.exports = async function handleEvent(event) {
   switch (event.type) {
     case 'message':
       // Handle message event
       console.log('Handling message event');
-      handleMessage(event, userSessions);
+      handleMessage(event);
       break;
     case 'follow':
       // Handle follow event

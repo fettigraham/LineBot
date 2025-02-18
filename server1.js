@@ -13,16 +13,13 @@ const options = {
     cert: fs.readFileSync('/etc/letsencrypt/live/zzza.space/fullchain.pem')
 };
 
-// Store user sessions and dialogue states
-const userSessions = {};
-
 // Handle webhook POST requests
 app.post('/webhook', async (req, res) => {
     const events = req.body.events;
 
     if (events && events.length > 0) {
         await Promise.all(events.map(async (event) => {
-		await handleEvent(event, userSessions);
+		await handleEvent(event);
    	 }));
    }
     res.status(200).send('Webhook received successfully!');
