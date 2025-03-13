@@ -4,7 +4,7 @@ const mysql = require('mysql');
 const db = mysql.createConnection({
   host: '127.0.0.1',
   user: 'root',
-  password: 'IamiitG1!1!', // Replace 'your_password' with your actual MySQL root password
+  password: '', // Replace 'your_password' with your actual MySQL root password
   database: 'LineBotDB'
 });
 
